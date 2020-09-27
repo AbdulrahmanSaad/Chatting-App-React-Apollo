@@ -2,10 +2,20 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import ApolloClient from 'apollo-boost';
+import {
+  ApolloProvider
+} from 'react-apollo';
+
+const client = new ApolloClient({
+  uri: "http://localhost:3003"
+})
 
 ReactDOM.render(
-  <React.StrictMode>
+  <ApolloProvider
+    client={client}
+  >
     <App />
-  </React.StrictMode>,
+  </ApolloProvider>,
   document.getElementById('root')
 );
