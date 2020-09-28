@@ -8,6 +8,10 @@ import { inject, observer } from "mobx-react";
 import {
     withRouter
 } from 'react-router-dom';
+import LoginMutation from '../Mutations/LoginMutation';
+import {
+    Mutation
+} from 'react-apollo';
 
 class LoginWindow extends Component {
 
@@ -19,13 +23,15 @@ class LoginWindow extends Component {
         this.props.store.setPassword(password)
     }
 
-    onPress = async() => {
+    onPress = async(getResult) => {
 
         const {
             push
         } = this.props.history
-
-        await this.props.store.login()
+        
+        await getResult().then(res => {
+            this.props.store.setToken(res.data.login.token)
+        })
         push('./chat')
     }
 
@@ -50,10 +56,22 @@ class LoginWindow extends Component {
                 onChange={this.handlePassword}
                 value={password}
                 />
-                <ButtonComponent
-                    title={'Login'}
-                    onPress={this.onPress}
-                />
+                 <Mutation
+                variables={{
+                    email,
+                    password
+                }}
+                mutation={LoginMutation}
+            >
+                {mutate => {
+                    return (
+                        <ButtonComponent
+                            title={'Login'}
+                            onPress={() => this.onPress(mutate)}
+                        />
+                    )
+                }}
+            </Mutation>
             </div>
         )
     }
