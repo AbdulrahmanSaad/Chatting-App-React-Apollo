@@ -29,10 +29,11 @@ class LoginWindow extends Component {
             push
         } = this.props.history
         
-        await getResult().then(res => {
-            this.props.store.setToken(res.data.login.token)
+        getResult().then(res => {
+            localStorage.setItem('token', res.data.login.token)
+        }).then(() => {
+            push('./chat')
         })
-        push('./chat')
     }
 
     render (){

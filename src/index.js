@@ -7,8 +7,12 @@ import {
   ApolloProvider
 } from 'react-apollo';
 
+const token = localStorage.getItem('token')
 const client = new ApolloClient({
-  uri: "http://localhost:3003"
+  uri: "http://localhost:3003",
+  headers: {
+    authorization: `Bearer ${token}`
+  }
 })
 
 ReactDOM.render(

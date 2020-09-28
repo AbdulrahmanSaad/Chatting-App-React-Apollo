@@ -5,13 +5,12 @@ import {
 } from '../components/Index';
 import '../App.css';
 import { inject, observer } from "mobx-react";
+import {
+    Query
+} from 'react-apollo';
+import MessagesQuery from '../Query/MessagesQuery';
 
 class ChatWindow extends Component {
-
-    constructor(props) {
-        super(props);
-        this.props.store.getMessages()
-    }
 
     renderItem = (item) => {
         return <h10>aaaaaaa</h10>
@@ -28,7 +27,6 @@ class ChatWindow extends Component {
     render() {
 
         const {
-            messages,
             messageText
         } = this.props.store
 
@@ -38,14 +36,22 @@ class ChatWindow extends Component {
                 className="ChatList"
                 >
                 <dl
+                ><Query
+                query={MessagesQuery}
                 >
-                    {
-                        messages ? messages.map((item) => {
-                           return (
-                           <dl key={item.id}>{item.message}</dl>
-                           )
-                        }) : null
-                    }
+                    {({data, loading}) => {
+                        if(loading) return <h1>LOADING</h1>
+                        this.props.store.setData(data.messages)
+                        const {
+                            messages
+                        } = this.props.store
+                        return messages.map((item) => {
+                            return (
+                            <dl key={item._id}>{item.text}</dl>
+                            )
+                        })
+                    }}
+                </Query>
                 </dl>
                 </div>
                 <TextInputComponent
