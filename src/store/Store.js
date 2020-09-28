@@ -6,7 +6,6 @@ class UserStore {
     password = ''
     messages = null
     messageText = ''
-    token = ''
 
     setEmail = (data) => {
         this.email = data
@@ -35,8 +34,6 @@ decorate(UserStore, {
     messages: observable,
     setEmail: action,
     setPassword: action,
-    login: action,
-    getMessages: action,
     setData: action,
     messageText: observable,
     sendMessage: action

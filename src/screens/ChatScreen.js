@@ -12,9 +12,7 @@ import MessagesQuery from '../Query/MessagesQuery';
 
 class ChatWindow extends Component {
 
-    renderItem = (item) => {
-        return <h10>aaaaaaa</h10>
-    }
+    renderItem = (messages) => messages.map((item) => <dl key={item._id}>{item.text}</dl>)
 
     onChange = (message) => {
         this.props.store.setMessage(message);
@@ -33,26 +31,22 @@ class ChatWindow extends Component {
         return (
             <div>
                 <div
-                className="ChatList"
+                    className="ChatList"
                 >
-                <dl
-                ><Query
-                query={MessagesQuery}
-                >
-                    {({data, loading}) => {
-                        if(loading) return <h1>LOADING</h1>
-                        this.props.store.setData(data.messages)
-                        const {
-                            messages
-                        } = this.props.store
-                        return messages.map((item) => {
-                            return (
-                            <dl key={item._id}>{item.text}</dl>
-                            )
-                        })
-                    }}
-                </Query>
-                </dl>
+                    <dl>
+                        <Query
+                            query={MessagesQuery}
+                        >
+                            {({ data, loading }) => {
+                                if (loading) return <h1>LOADING</h1>
+                                this.props.store.setData(data.messages)
+                                const {
+                                    messages
+                                } = this.props.store
+                                return this.renderItem(messages)
+                            }}
+                        </Query>
+                    </dl>
                 </div>
                 <TextInputComponent
                     onChange={this.onChange}
