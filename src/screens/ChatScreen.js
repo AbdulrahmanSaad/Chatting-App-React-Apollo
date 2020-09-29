@@ -6,9 +6,11 @@ import {
 import '../App.css';
 import { inject, observer } from "mobx-react";
 import {
-    Query
+    Query,
+    Mutation
 } from 'react-apollo';
 import MessagesQuery from '../Query/MessagesQuery';
+import MessageMutation from '../Mutations/MessageMutation';
 
 class ChatWindow extends Component {
 
@@ -18,8 +20,10 @@ class ChatWindow extends Component {
         this.props.store.setMessage(message);
     }
 
-    onPress = () => {
-        this.props.store.sendMessage()
+    onPress = (sendMessage) => {
+        sendMessage().then(res => {
+            console.log(res)
+        })
     }
 
     render() {
@@ -53,10 +57,19 @@ class ChatWindow extends Component {
                     value={messageText}
                     placeholder={'Message'}
                 />
-                <ButtonComponent
-                    title={"Send"}
-                    onPress={this.onPress}
-                />
+                <Mutation
+                    variables={{
+                        text: messageText
+                    }}
+                    mutation={MessageMutation}
+                >
+                    {
+                        mutate => <ButtonComponent
+                            title={"Send"}
+                            onPress={() => this.onPress(mutate)}
+                        />
+                    }
+                </Mutation>
             </div>
         )
     }
