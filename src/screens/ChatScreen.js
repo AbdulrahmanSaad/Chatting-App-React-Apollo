@@ -11,18 +11,38 @@ import {
 } from 'react-apollo';
 import MessagesQuery from '../Query/MessagesQuery';
 import MessageMutation from '../Mutations/MessageMutation';
+import MessageSubsriptionsComponent from '../Subscriptions/MessageSubsriptionsComponent';
+import { gql } from "apollo-boost";
+
+const newMessage = gql`
+  subscription {
+    message {
+        _id
+        text
+    }
+  }
+`;
+
+let unsubscribe = null;
 
 class ChatWindow extends Component {
 
-    renderItem = (messages) => messages.map((item) => <dl key={item._id}>{item.text}</dl>)
+    renderItem = (data) => {
+        const {
+            setData
+        } = this.props.store
+
+        setData(data)
+        return data.map((item) => <dl key={item._id}>{item.text}</dl>)
+    }
 
     onChange = (message) => {
         this.props.store.setMessage(message);
     }
 
     onPress = (sendMessage) => {
-        sendMessage().then(res => {
-            console.log(res)
+        sendMessage().then(() =>{
+            this.props.store.setMessage('')
         })
     }
 
@@ -41,12 +61,27 @@ class ChatWindow extends Component {
                         <Query
                             query={MessagesQuery}
                         >
-                            {({ data, loading }) => {
-                                if (loading) return <h1>LOADING</h1>
-                                this.props.store.setData(data.messages)
+                            {({ loading, data, subscribeToMore }) => {
+                                if (loading) {
+                                    return null;
+                                }
+
+                                if (!unsubscribe) {
+                                    unsubscribe = subscribeToMore({
+                                        document: newMessage,
+                                        updateQuery: (prev, { subscriptionData }) => {
+                                            if (!subscriptionData.data) return prev;
+                                            const { message } = subscriptionData.data;
+                                            return {
+                                                ...prev,
+                                                messages: [...prev.messages, message]
+                                            };
+                                        }
+                                    });
+                                }
                                 const {
                                     messages
-                                } = this.props.store
+                                } = data
                                 return this.renderItem(messages)
                             }}
                         </Query>
@@ -70,6 +105,7 @@ class ChatWindow extends Component {
                         />
                     }
                 </Mutation>
+                <MessageSubsriptionsComponent />
             </div>
         )
     }
