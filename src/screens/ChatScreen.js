@@ -11,29 +11,19 @@ import {
 } from 'react-apollo';
 import MessagesQuery from '../Query/MessagesQuery';
 import MessageMutation from '../Mutations/MessageMutation';
-import MessageSubsriptionsComponent from '../Subscriptions/MessageSubsriptionsComponent';
-import { gql } from "apollo-boost";
-
-const newMessage = gql`
-  subscription {
-    message {
-        _id
-        text
-    }
-  }
-`;
+import MessagesSubsription from '../Subscriptions/MessageSubsriptions';
 
 let unsubscribe = null;
 
 class ChatWindow extends Component {
 
-    renderItem = (data) => {
+    renderItem = () => {
         const {
-            setData
+            messages
         } = this.props.store
 
-        setData(data)
-        return data.map((item) => <dl key={item._id}>{item.text}</dl>)
+        if (messages) return messages.map((item) => <dl key={item._id}>{item.text}</dl>)
+        return "No messages yet"
     }
 
     onChange = (message) => {
@@ -49,7 +39,8 @@ class ChatWindow extends Component {
     render() {
 
         const {
-            messageText
+            messageText,
+            setData
         } = this.props.store
 
         return (
@@ -68,7 +59,7 @@ class ChatWindow extends Component {
 
                                 if (!unsubscribe) {
                                     unsubscribe = subscribeToMore({
-                                        document: newMessage,
+                                        document: MessagesSubsription,
                                         updateQuery: (prev, { subscriptionData }) => {
                                             if (!subscriptionData.data) return prev;
                                             const { message } = subscriptionData.data;
@@ -82,7 +73,9 @@ class ChatWindow extends Component {
                                 const {
                                     messages
                                 } = data
-                                return this.renderItem(messages)
+                        
+                                setData(messages)
+                                return this.renderItem()
                             }}
                         </Query>
                     </dl>
@@ -105,7 +98,6 @@ class ChatWindow extends Component {
                         />
                     }
                 </Mutation>
-                <MessageSubsriptionsComponent />
             </div>
         )
     }
