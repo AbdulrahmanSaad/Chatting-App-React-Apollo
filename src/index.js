@@ -27,7 +27,7 @@ const authLink = setContext((_, { headers }) => {
 });
 
 const wsLink = new WebSocketLink({
-  uri: `ws://localhost:3003`,
+  uri: `ws://localhost:3000`,
   options: {
     reconnect: true
   }
@@ -35,7 +35,7 @@ const wsLink = new WebSocketLink({
 
 
 const httpLink = new HttpLink({
-  uri: 'http://localhost:3003',
+  uri: 'http://localhost:3000',
 });
 
 const splitLink = split(
